@@ -19,7 +19,7 @@ def room_is_valid(letters, checksum):
     return checksum == ''.join(common)
 
 def most_common_letters(letters):
-    ordered = sorted(letters)
+    ordered = sorted(letters.replace('-',''))
     common = OrderedCounter(ordered).most_common()
     return [x[0] for x in common[0:5]]
 
@@ -31,14 +31,27 @@ def parse_checksum(line):
 def parse_encrypted(line):
     end = line.index('[')
     data, _, sector = line[0:end].rpartition('-')
-    return data.replace('-',''), int(sector)
+    return data, int(sector)
+
+def rotate(letters, num):
+    rotated = [rotate_letter(c, num) for c in letters]
+    return ''.join(rotated)
+
+def rotate_letter(c, num):
+    if c == '-':
+        return ' '
+    ordinal = ord(c)-ord('a')
+    rotated = (ordinal + num) % 26
+    return chr(ord('a') + rotated)
 
 sector_sum = 0
 for line in lines:
     checksum = parse_checksum(line)
     letters, sector = parse_encrypted(line)
-    most_common_letters(letters)
     if (room_is_valid(letters, checksum)):
         sector_sum += sector
+        decoded = rotate(letters, sector)
+        if 'north' in decoded:
+            print(decoded, sector)
 
 print(sector_sum)
