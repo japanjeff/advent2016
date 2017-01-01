@@ -5,9 +5,24 @@ display = [[None for x in range(columns)] for y in range(rows)]
 def dump(display):
     for row in display:
         print(''.join('#' if cell else '.' for cell in row))
+    print()
+
+def rotate_column(display, column):
+    temp = display[0][column]
+    for row in range(5, 1):
+        display[row][column] = display[row-1][column]
+    display[5][column] = temp
+
+def rotate_row(display, row, n):
+    l = display[row]
+    display[row] = l[-n:] + l[:-n]
 
 display[0][0] = 1
 display[1][1] = 1
 display[2][2] = 1
 
+dump(display)
+rotate_row(display, 0, 3)
+dump(display)
+rotate_row(display, 0, -3)
 dump(display)
