@@ -1,5 +1,25 @@
 import itertools
 
+def collect_plain_text(iterable):
+    return take_until_char('(', iterable)
+
+def decode(iterable, chars, multiplier):
+    charsToMultiply = list(itertools.islice(iterable, chars))
+    toMultiply = ''.join(charsToMultiply)
+    return toMultiply * multiplier
+
+def get_decode_parms(iterable):
+    chars = take_until_char('x', iterable)
+    multiplier = take_until_char(')', iterable)
+    if not chars and not multiplier:
+        return False, 0, 0
+
+    return True, int(chars), int(multiplier)
+
+def take_until_char(char, iterable):
+    collected = itertools.takewhile(lambda x: x != char, iterable)
+    return ''.join(collected)
+
 with open('input-9.txt') as f:
     text = f.read().splitlines()[0]
 
@@ -12,37 +32,16 @@ with open('input-9.txt') as f:
 #text = 'X(8x2)(3x3)ABCY' # Expected X(3x3)ABC(3x3)ABCY
 
 decoded = ''
-
-def CollectPlainText(iterable):
-    return TakeUntilChar('(', iterable)
-
-def Decode(iterable, chars, multiplier):
-    charsToMultiply = list(itertools.islice(iterable, chars))
-    toMultiply = ''.join(charsToMultiply)
-    return toMultiply * multiplier
-
-def GetDecodeParms(iterable):
-    chars = TakeUntilChar('x', iterable)
-    multiplier = TakeUntilChar(')', iterable)
-    if not chars and not multiplier:
-        return False, 0, 0
-
-    return True, int(chars), int(multiplier)
-
-def TakeUntilChar(char, iterable):
-    collected = itertools.takewhile(lambda x: x != char, iterable)
-    return ''.join(collected)
-
 iterable = iter(text)
-decoded += CollectPlainText(iterable)
+decoded += collect_plain_text(iterable)
 
 while True:
-    found, chars, multiplier = GetDecodeParms(iterable)
+    found, chars, multiplier = get_decode_parms(iterable)
     if not found:
         break;
 
-    decoded += Decode(iterable, chars, multiplier)
-    morePlainText = CollectPlainText(iterable)
+    decoded += decode(iterable, chars, multiplier)
+    morePlainText = collect_plain_text(iterable)
     decoded += morePlainText
 
 print(len(decoded))
